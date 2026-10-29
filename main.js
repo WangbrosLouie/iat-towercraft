@@ -4,8 +4,8 @@ console.log("this is like a println(); kinda");
 
 setInterval(moveSquare, 1/60);
 
-var playerX = 0;
-var playerY = 0;
+var playerX = 50;
+var playerY = 50;
 var keyList = {
     'w': false,
     'a': false,
@@ -19,21 +19,29 @@ function moveSquare() {
 
 	var style = player.style;
 
+    var horiMove = keyList['a'] ^ keyList['d'];
+    var vertMove = keyList['w'] ^ keyList['s'];
+
+    print(horiMove + " " + vertMove);
+
 	if (keyList['a'] && !keyList['d']) {
-        playerX--;
+        //playerX -= horiMove?1:2;
+        playerX -= 2-vertMove;
     } else if (!keyList['a'] && keyList['d']) {
-        playerX++;
+        //playerX += horiMove?1:2;
+        playerX += 2-vertMove;
     }
 
 	if (keyList['w'] && !keyList['s']) {
-        playerY--;
+        //playerY -= vertMove?1:2;
+        playerY -= 2-horiMove;
     } else if (!keyList['w'] && keyList['s']) {
-        playerY++;
+        //playerY += vertMove?1:2;
+        playerY += 2-horiMove;
     }
 	
 	style.left = playerX + "px";
 	style.top = playerY + "px";
-	print(style.left);
 	
 }
 
@@ -42,9 +50,8 @@ document.addEventListener("keydown", (event) => {
     if (keyList[keyName] != undefined) {
         keyList[keyName] = true;
     }
-    print(keyList[keyName]);
 
-    console.log(keyName);
+    //console.log(keyName);
 });
 
 document.addEventListener("keyup", (event) => {
@@ -54,7 +61,7 @@ document.addEventListener("keyup", (event) => {
         keyList[keyName] = false;
     }
 
-    console.log(keyName);
+    //console.log(keyName);
 });
 
 /* to-do
