@@ -3,25 +3,28 @@
 
 <head>
 
-    <title>Towercraft Prototype version whatever</title>
+    <title>Towercraft Prototype version v0.1.0</title>
 	<link rel="stylesheet" href="style.css">
 	<script src="main.js"></script>
 
 </head>
 
-<body>
+<body onLoad="main();">
 
     <div id="frame">
-        wasd to move<br>
+        <span style="margin:auto;">wasd to move</span><br>
+        please keep window scale at 100% for it to display properly.<br>
         to-do<br>
         make tower plot<br>
         make build spots<br>
         implement build spot detection<br>
-        disallow moving out of bounds<br>
-        make global scale (browser window size does not change game field size)<br>
         add resources, money<br>
         maybe add collision detection for the tower, if wanted<br>
-		<div id="player">meow</div>
+		<img id="player" src="assets/player.png" alt="Player
+O
++
+A"></img>
+        <div id="tower"></div>
     </div>
 
 </body>
