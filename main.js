@@ -24,7 +24,7 @@ var money = 10;
 var materials = 10;
 var spotList = [];
 const buildTime = frameRate;
-const resourceTime = 1;
+const materialTime = 1;
 
 var windowScale = 1;
 var borderX = 0;
@@ -40,6 +40,7 @@ class Spot {
         this.height = playerSize;
         this.framesIn = 0; //how many frames has the player been inside
         this.element.style.position = "absolute";
+        this.element.style.zIndex = 80;
         this.element.style.left = transX(this.X) + "px";
         this.element.style.top = transY(this.Y) + "px";
         this.element.style.width = playerSize * windowScale + "px";
@@ -67,9 +68,9 @@ class BuildSpot extends Spot {
     }
 }
 
-class ResourceSpot extends Spot {
+class MaterialSpot extends Spot {
     constructor(X,Y) {
-        super(X,Y,"resource");
+        super(X,Y,"material");
         this.element.src = "assets/wood.png";
         document.getElementById("frame").appendChild(this.element);
     }
@@ -84,7 +85,7 @@ function main() {
     statuss = document.getElementById("status");
 
     spotList.push(new BuildSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
-    spotList.push(new ResourceSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
+    spotList.push(new MaterialSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
 
     windowResized();
     setInterval(loop, 1000/frameRate);
@@ -143,14 +144,14 @@ function checkCollisions() {
                     }
                 }
                 break;
-            case "resource":
+            case "material":
                 if (playerX+playerSize>spot.X && playerX<spot.X+spot.width && playerY+playerSize>spot.Y && playerY<spot.Y+spot.width) {
                     spot.framesIn++
-                    if (spot.framesIn >= resourceTime) {
+                    if (spot.framesIn >= materialTime) {
                         spotList.splice(i, 1);
                         spot.destroy();
                         materials++;
-                            spotList.push(new ResourceSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
+                            spotList.push(new MaterialSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
                     }
                 }
                 break;
@@ -169,7 +170,7 @@ function processGame() {
         buildpct = 0;
     }
 
-    statuss.innerHTML = "Build Percent: " + buildpct + "%, Resources: " + materials;
+    statuss.innerHTML = "Build Percent: " + buildpct + "%, Materials: " + materials;
     tower.innerHTML = "Floors: " + floors;
 
 }

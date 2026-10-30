@@ -1,6 +1,9 @@
 html { width: 100%;
 	height: 100%;
 	overflow: hidden;
+	color: gold;
+	text-shadow: 1px 1px 0 black,-1px 1px 0 black,1px -1px 0 black,-1px -1px 0 black;
+	background: black;
 }
 
 body { display: block;
@@ -13,7 +16,7 @@ body { display: block;
 #frame { display: block;
 	width: 100%;
 	height: 100%;
-	background: lightgrey;
+	background: green;
 }
 
 #player { display: inline;
@@ -37,6 +40,7 @@ body { display: block;
 	left: 45.5%;
 	text-align: center;
 	line-height: 100%;
-	background: white;
+	color: white;
+	background: grey;
 	z-index: 70;
 }
