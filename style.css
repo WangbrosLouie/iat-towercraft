@@ -32,7 +32,7 @@ body { display: block;
 	white-space: pre-wrap;
 }
 
-#tower {display: inline;
+#tower { display: inline;
 	width: 9%;
 	height: 16%;
 	position: absolute;
