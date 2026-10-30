@@ -11,20 +11,25 @@
 
 <body onLoad="main();">
 
+    <template id="spot"><img></template>
+
     <div id="frame">
-        <span style="margin:auto;">wasd to move</span><br>
-        please keep window scale at 100% for it to display properly.<br>
+        Towercraft v0.2.0
+        <div style="width:100%;text-align:center;">
+            wasd to move<br>
+            go over hammers for 1 sec to build tower, go over wood to get resources<br>
+            you need 5 resources to build once<br>
+        </div>
+        <div style="width:100%;text-align:center;" id="status"></div>
         to-do<br>
-        make tower plot<br>
-        make build spots<br>
-        implement build spot detection<br>
-        add resources, money<br>
+        add money<br>
         maybe add collision detection for the tower, if wanted<br>
+        better sprites<br>
 		<img id="player" src="assets/player.png" alt="Player
 O
 +
 A"></img>
-        <div id="tower"></div>
+        <div id="tower">Floors: 0</div>
     </div>
 
 </body>

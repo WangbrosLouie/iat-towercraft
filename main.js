@@ -16,17 +16,85 @@ var keyList = {
     'd': false
 };
 
+var tower;
+var statuss;
+var floors = 0;
+var buildpct = 0;
+var money = 10;
+var materials = 10;
+var spotList = [];
+const buildTime = frameRate;
+const resourceTime = 1;
+
 var windowScale = 1;
 var borderX = 0;
 var borderY = 0;
+
+class Spot {
+    constructor(X,Y,type) {
+        this.element = document.createElement("img");
+        this.X = X;
+        this.Y = Y;
+        this.type = type;
+        this.width = playerSize;
+        this.height = playerSize;
+        this.framesIn = 0; //how many frames has the player been inside
+        this.element.style.position = "absolute";
+        this.element.style.left = transX(this.X) + "px";
+        this.element.style.top = transY(this.Y) + "px";
+        this.element.style.width = playerSize * windowScale + "px";
+        this.element.style.height =  playerSize * windowScale + "px";
+    }
+
+    updateView() {
+        this.element.style.left = transX(this.X) + "px";
+        this.element.style.top = transY(this.Y) + "px";
+        this.element.style.width = playerSize * windowScale + "px";
+        this.element.style.height =  playerSize * windowScale + "px";
+    }
+
+    destroy() {
+        this.element.remove();
+        // this = null;
+    }
+}
+
+class BuildSpot extends Spot {
+    constructor(X,Y) {
+        super(X,Y,"build");
+        this.element.src = "assets/buildspot.png";
+        document.getElementById("frame").appendChild(this.element);
+    }
+}
+
+class ResourceSpot extends Spot {
+    constructor(X,Y) {
+        super(X,Y,"resource");
+        this.element.src = "assets/wood.png";
+        document.getElementById("frame").appendChild(this.element);
+    }
+}
+
 
 function main() {
 
     player = document.getElementById("player"); //note: player is 25x25 ingame pixels
     playerStyle = player.style;
-    windowResized();
-    setInterval(moveSquare, 1000/frameRate);
+    tower = document.getElementById("tower");
+    statuss = document.getElementById("status");
 
+    spotList.push(new BuildSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
+    spotList.push(new ResourceSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
+
+    windowResized();
+    setInterval(loop, 1000/frameRate);
+
+}
+
+function loop() {
+    moveSquare();
+    checkCollisions();
+    processGame();
 }
 
 function moveSquare() {
@@ -57,6 +125,55 @@ function moveSquare() {
 	
 }
 
+function checkCollisions() {
+
+    var i = 0;
+    while (i < spotList.length) {
+        var spot = spotList[i];
+        switch (spot.type) {
+            case "build":
+                if (playerX+playerSize>spot.X && playerX<spot.X+spot.width && playerY+playerSize>spot.Y && playerY<spot.Y+spot.width) {
+                    if(materials>=5)spot.framesIn++;
+                    if (spot.framesIn >= buildTime) {
+                        spotList.splice(i, 1);
+                        spot.destroy();
+                        buildpct += 25;
+                        materials -= 5;
+                        spotList.push(new BuildSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
+                    }
+                }
+                break;
+            case "resource":
+                if (playerX+playerSize>spot.X && playerX<spot.X+spot.width && playerY+playerSize>spot.Y && playerY<spot.Y+spot.width) {
+                    spot.framesIn++
+                    if (spot.framesIn >= resourceTime) {
+                        spotList.splice(i, 1);
+                        spot.destroy();
+                        materials++;
+                            spotList.push(new ResourceSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
+                    }
+                }
+                break;
+            default:
+                print("oh noes");
+        }
+        i++;
+    }
+
+}
+
+function processGame() {
+
+    if (buildpct >= 100) {
+        floors++;
+        buildpct = 0;
+    }
+
+    statuss.innerHTML = "Build Percent: " + buildpct + "%, Resources: " + materials;
+    tower.innerHTML = "Floors: " + floors;
+
+}
+
 // WINDOW RELATED FUNCTIONS ---------------------------------------------------
 
 addEventListener("resize", windowResized);
@@ -67,7 +184,6 @@ function windowResized() {
 function resizeWindow(w, h) {
 
     var frame = document.getElementById("frame");
-    // var frame = document.body;
     var frameStyle = frame.style;
 
     //cut off subpixels
@@ -85,9 +201,6 @@ function resizeWindow(w, h) {
         frameStyle.height = newH + "px";
         frameStyle.margin = borderY + "px 0";
 
-        playerStyle.width = playerSize * windowScale + "px";
-        playerStyle.height =  playerSize * windowScale + "px";
-
     } else { //clamp window size by height
 
         windowScale = h/450;
@@ -99,12 +212,21 @@ function resizeWindow(w, h) {
         frameStyle.width = newW + "px";
         frameStyle.height = h + "px";
 
-        playerStyle.width = playerSize * windowScale + "px";
-        playerStyle.height =  playerSize * windowScale + "px";
     }
 
+    playerStyle.width = playerSize * windowScale + "px";
+    playerStyle.height =  playerSize * windowScale + "px";
     playerStyle.left = transX(playerX) + "px";
     playerStyle.top = transY(playerY) + "px";
+
+    for (var spot of spotList) {
+        spot.updateView();
+    }
+
+    tower.style.width = 100 * windowScale + "px";
+    tower.style.height = 100 * windowScale + "px";
+    tower.style.left = transX(350) + "px";
+    tower.style.top = transY(175) + "px";
 }
 
 function transX(x) {
@@ -131,14 +253,7 @@ document.addEventListener("keyup", (event) => {
     }
 });
 
-/* to-do
-
-	scan keypresses
-	react to keypresses
-	make a box element (temp player)
-	make it move around with wasd or arrows
-	
-*/
+// MISC FUNCTIONS -------------------------------------------------------------
 
 function print(thing) {
     console.log(thing);
