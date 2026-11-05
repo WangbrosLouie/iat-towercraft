@@ -84,11 +84,14 @@ function main() {
     tower = document.getElementById("tower");
     statuss = document.getElementById("status");
 
+    tower.style.display = "inline";
     spotList.push(new BuildSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
     spotList.push(new MaterialSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
 
     windowResized();
     setInterval(loop, 1000/frameRate);
+
+    document.getElementById("warning").remove(); // if all goes well, remove the error warning
 
 }
 
