@@ -3,7 +3,7 @@
 
 <head>
 
-    <title>Towercraft Prototype version v0.2.1a</title>
+    <title>Towercraft Prototype version v0.2.2a</title>
 	<link rel="stylesheet" href="style.css">
 	<script src="main.js"></script>
 
@@ -14,7 +14,7 @@
     <template id="spot"><img></template>
 
     <div id="frame">
-        Towercraft v0.2.1a
+        Towercraft v0.2.2a
         <div style="width:100%;text-align:center;">
             wasd to move<br>
             go over hammers for 1 sec to build tower, go over wood to get resources<br>
@@ -25,11 +25,35 @@
         add money<br>
         maybe add collision detection for the tower, if wanted<br>
         better sprites<br>
+        touch controls<br>
 		<img id="player" src="assets/player.png" alt="Player
 O
 +
 A">
         <div id="tower">Floors: 0</div>
+        <div id="warning">
+            <h3>error! if this message is on screen, the game broke somehow.</h3>
+            this can be because of a variety of reasons:<br>
+            <ul>
+                <li>your browser is still loading this page</li>
+                <li>you are running this index.html without any of the assets in the same folder</li>
+                <li>you downloaded a zip of this game but didn't extract it to a folder</li>
+                <li>you have javascript disabled on your browser</li>
+                <li>your browser is too old to run the javascript (lookin at you ie 11)</li>
+                <li>the javascript file is corrupted</li>
+                <li>there is a bug in the code</li>
+            </ul>
+            in any case, try running the game with the files and asset folder all in one folder<br>
+            (and redownload/re-extract the files if needed)<br>
+            that is, you should be able to see in your file explorer:<br>
+            <ol>
+                <li>assets (folder)</li>
+                <li>index.html</li>
+                <li>main.js</li>
+                <li>style.css</li>
+            </ol>
+            if this error occurs on the website, please open an issue on the <a href="https://github.com/WangbrosLouie/iat-towercraft/issues/">github issue tracker here (link)</a>
+        </div>
     </div>
 
 </body>
