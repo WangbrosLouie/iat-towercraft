@@ -1,4 +1,4 @@
-const version = "0.6.0";
+const version = "0.6.1";
 
 const windowX = 800;
 const windowY = 450;
