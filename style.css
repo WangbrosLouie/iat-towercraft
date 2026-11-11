@@ -44,3 +44,16 @@ body { display: block;
 	background: grey;
 	z-index: 70;
 }
+
+/* game message stuff */
+
+#messageList { display: inline;
+	position: absolute;
+	top: 0;
+}
+
+.gameMessage { color: gold;
+	text-shadow: 1px 1px 0 black,-1px 1px 0 black,1px -1px 0 black,-1px -1px 0 black;
+	font-size: 1em;
+	border-bottom: 1px solid black;
+}

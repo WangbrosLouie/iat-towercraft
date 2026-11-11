@@ -1,3 +1,5 @@
+const version = "0.3.0";
+
 const windowX = 800;
 const windowY = 450;
 
@@ -17,9 +19,11 @@ var keyList = {
 };
 
 var tower;
-var statuss;
+var statusUI;
 var floors = 0;
 var buildpct = 0;
+var buildStartTime = 0;
+var buildEndTime = 0;
 var money = 10;
 var materials = 10;
 var spotList = [];
@@ -29,6 +33,8 @@ const materialTime = 1;
 var windowScale = 1;
 var borderX = 0;
 var borderY = 0;
+
+var messageList;
 
 class Spot {
     constructor(X,Y,type) {
@@ -82,16 +88,23 @@ function main() {
     player = document.getElementById("player"); //note: player is 25x25 ingame pixels
     playerStyle = player.style;
     tower = document.getElementById("tower");
-    statuss = document.getElementById("status");
+    statusUI = document.getElementById("status");
 
     tower.style.display = "inline";
     spotList.push(new BuildSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
     spotList.push(new MaterialSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
 
+    messageList = document.getElementById("messageList");
+
     windowResized();
     setInterval(loop, 1000/frameRate);
 
     document.getElementById("warning").remove(); // if all goes well, remove the error warning
+
+    displayMessage("Towercraft v" + version);
+    document.title = "Towercraft v" + version;
+
+    displayMessage("this is a message. it will fade away after 5 seconds, so be sure to read them quickly!")
 
 }
 
@@ -99,6 +112,7 @@ function loop() {
     moveSquare();
     checkCollisions();
     processGame();
+    updateUI();
 }
 
 function moveSquare() {
@@ -144,6 +158,7 @@ function checkCollisions() {
                         buildpct += 25;
                         materials -= 5;
                         spotList.push(new BuildSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
+                        i--;
                     }
                 }
                 break;
@@ -154,7 +169,8 @@ function checkCollisions() {
                         spotList.splice(i, 1);
                         spot.destroy();
                         materials++;
-                            spotList.push(new MaterialSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
+                        spotList.push(new MaterialSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
+                        i--;
                     }
                 }
                 break;
@@ -171,9 +187,14 @@ function processGame() {
     if (buildpct >= 100) {
         floors++;
         buildpct = 0;
+        money += 5;
     }
 
-    statuss.innerHTML = "Build Percent: " + buildpct + "%, Materials: " + materials;
+}
+
+function updateUI() {
+
+    statusUI.innerHTML = "Build Percent: " + buildpct + "%, Materials: " + materials + "/20, Money: $" + money;
     tower.innerHTML = "Floors: " + floors;
 
 }
@@ -205,6 +226,9 @@ function resizeWindow(w, h) {
         frameStyle.height = newH + "px";
         frameStyle.margin = borderY + "px 0";
 
+        messageList.style.left = "0";
+        messageList.style.top = borderY + "px";
+
     } else { //clamp window size by height
 
         windowScale = h/450;
@@ -215,6 +239,9 @@ function resizeWindow(w, h) {
         frameStyle.margin =  "0 " + borderX + "px";
         frameStyle.width = newW + "px";
         frameStyle.height = h + "px";
+
+        messageList.style.left = borderX + "px";
+        messageList.style.top = "0";
 
     }
 
@@ -239,6 +266,28 @@ function transX(x) {
 
 function transY(y) {
     return y*windowScale+borderY;
+}
+
+function displayMessage(msg) {
+
+    let message = document.createElement("div");
+    message.innerHTML = msg;
+    message.className = "gameMessage";
+    messageList.appendChild(message);
+    let animFrame = 0;
+    setTimeout((event) => {
+        let interval = setInterval((event) => {message.style.opacity = 1-(animFrame/frameRate);animFrame++}, 1000/frameRate);
+        setTimeout((event)=>{clearInterval(interval);message.remove();}, 1000)
+    }, 4000);
+
+}
+
+function displayWarning(warning) { //this is like display message but only 1 warning at a time, has its own box on the screen, use this for tutorial or errors
+
+}
+
+function toggleShop() {
+
 }
 
 // KEYBOARD RELATED FUNCTIONS -------------------------------------------------

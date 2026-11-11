@@ -3,7 +3,7 @@
 
 <head>
 
-    <title>Towercraft Prototype version v0.2.2a</title>
+    <title>Towercraft</title>
 	<link rel="stylesheet" href="style.css">
 	<script src="main.js"></script>
 
@@ -11,26 +11,38 @@
 
 <body onLoad="main();">
 
+    <!-- 
+        to-do<br>
+        add shop<br>
+        visual indicators for spot status<br>
+        better sprites<br>
+        touch controls<br>
+        maybe add collision detection for the tower, if wanted<br>
+
+
+        <button onClick="materials+=999">cheat button (mats)</button>
+        <button onClick="buildPct=100">cheat button (b%)</button>
+        <button onClick="money+=999">cheat button ($$$)</button>
+    -->
+
     <template id="spot"><img></template>
 
     <div id="frame">
-        Towercraft v0.2.2a
         <div style="width:100%;text-align:center;">
-            wasd to move<br>
+            <br><br><br><br><br>
+            wasd to move, b to open shop<br>
             go over hammers for 1 sec to build tower, go over wood to get resources<br>
             you need 5 resources to build once<br>
         </div>
+
         <div style="width:100%;text-align:center;" id="status"></div>
-        to-do<br>
-        add money<br>
-        maybe add collision detection for the tower, if wanted<br>
-        better sprites<br>
-        touch controls<br>
+
 		<img id="player" src="assets/player.png" alt="Player
 O
 +
 A"></img>
         <div id="tower">Floors: 0</div>
+
         <div id="warning">
             <h3>error! if this message is on screen, the game broke somehow.</h3>
             this can be because of a variety of reasons:<br>
@@ -54,6 +66,8 @@ A"></img>
             </ol>
             if this error occurs on the website, please open an issue on the <a href="https://github.com/WangbrosLouie/iat-towercraft/issues/">github issue tracker here (link)</a>
         </div>
+
+        <div id="messageList"></div>
     </div>
 
 </body>
