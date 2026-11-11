@@ -30,8 +30,8 @@
     <div id="frame">
         <div style="width:100%;text-align:center;"><!--this is temporary-->
             <br><br><br><br>
-            <color style="color:white;">don't hold down the b key if you have epilepsy</color><br>
-            controls: wasd to move, b to open shop<br>
+            <color style="color:white;">don't hold down the b or o keys if you have epilepsy</color><br>
+            controls: wasd to move, b to open shop, o to open options<br>
             go over hammers for 1 sec to build tower, go over wood to get materials<br>
             you need 5 materials to build once, each build increases build percentage by 25%<br>
             every floor built gives $5, if completed under 10 seconds gives extra $5<br>
@@ -39,7 +39,7 @@
 
         <div style="width:100%;text-align:center;" id="status"></div>
 
-		<img id="player" src="assets/player.png" alt="Player
+		<img id="player" src="assets/playernew.png" alt="Player
 O
 +
 A">
@@ -87,10 +87,14 @@ A">
         </div>
 
         <div id="mobileControls">
-            <div class="mobilecontrol" id="mobileUp" onmouseover="mobileUp=true;" onmouseout="mobileUp=false;" ontouchstart="mobileUp=true;" ontouchend="mobileUp=false;">↑</div>
+            <!--<div class="mobilecontrol" id="mobileUp" onmouseover="mobileUp=true;" onmouseout="mobileUp=false;" ontouchstart="mobileUp=true;" ontouchend="mobileUp=false;">↑</div>
             <div class="mobilecontrol" id="mobileLeft" onmouseover="mobileLeft=true;" onmouseout="mobileLeft=false;" ontouchstart="mobileLeft=true;" ontouchend="mobileLeft=false;">←</div>
             <div class="mobilecontrol" id="mobileRight" onmouseover="mobileRight=true;" onmouseout="mobileRight=false;" ontouchstart="mobileRight=true;" ontouchend="mobileRight=false;">→</div>
-            <div class="mobilecontrol" id="mobileDown" onmouseover="mobileDown=true;" onmouseout="mobileDown=false;" ontouchstart="mobileDown=true;" ontouchend="mobileDown=false;">↓</div>
+            <div class="mobilecontrol" id="mobileDown" onmouseover="mobileDown=true;" onmouseout="mobileDown=false;" ontouchstart="mobileDown=true;" ontouchend="mobileDown=false;">↓</div>-->
+            <div class="mobilecontrol" id="mobileUp" ontouchstart="mobileUp=true;" ontouchend="mobileUp=false;">↑</div>
+            <div class="mobilecontrol" id="mobileLeft" ontouchstart="mobileLeft=true;" ontouchend="mobileLeft=false;">←</div>
+            <div class="mobilecontrol" id="mobileRight" ontouchstart="mobileRight=true;" ontouchend="mobileRight=false;">→</div>
+            <div class="mobilecontrol" id="mobileDown" ontouchstart="mobileDown=true;" ontouchend="mobileDown=false;">↓</div>
             <div id="mobileShop"></div>
             <div id="mobileOptions"></div>
         </div>

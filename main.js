@@ -1,4 +1,4 @@
-const version = "0.6.1";
+const version = "0.7.0";
 
 const windowX = 800;
 const windowY = 450;
@@ -29,7 +29,7 @@ var materials = 10;
 var maxMaterials = 20;
 var spotList = [];
 const buildTime = frameRate;
-const materialTime = 1;
+const materialTime = frameRate/2;
 
 var windowScale = 1;
 var borderX = 0;
@@ -103,7 +103,7 @@ class Spot {
 class BuildSpot extends Spot {
     constructor(X,Y) {
         super(X,Y,"build");
-        this.element.src = "assets/buildspot.png";
+        this.element.src = "assets/buildspotnew.png";
         document.getElementById("frame").appendChild(this.element);
     }
 }
@@ -111,7 +111,8 @@ class BuildSpot extends Spot {
 class MaterialSpot extends Spot {
     constructor(X,Y) {
         super(X,Y,"material");
-        this.element.src = "assets/wood.png";
+        this.element.src = "assets/wood5.png";
+        this.remaining = 5;
         document.getElementById("frame").appendChild(this.element);
     }
 }
@@ -237,11 +238,17 @@ function checkCollisions() {
                 if (spot.playerOverlapping()) {
                     spot.framesIn++
                     if (spot.framesIn >= materialTime) {
-                        spotList.splice(i, 1);
-                        spot.destroy();
                         materials++;
-                        spotList.push(new MaterialSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
-                        i--;
+                        spot.remaining--;
+                        if (spot.remaining <=0) {
+                            spotList.splice(i, 1);
+                            spot.destroy();
+                            spotList.push(new MaterialSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
+                            i--;
+                        } else {
+                            spot.framesIn = 0;
+                            spot.element.src = "assets/wood" + spot.remaining + ".png";
+                        }
                     }
                 }
                 break;
