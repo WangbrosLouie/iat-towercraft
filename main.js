@@ -1,4 +1,4 @@
-const version = "0.3.0";
+const version = "0.4.0";
 
 const windowX = 800;
 const windowY = 450;
@@ -23,7 +23,7 @@ var statusUI;
 var floors = 0;
 var buildpct = 0;
 var buildStartTime = 0;
-var buildEndTime = 0;
+var building = false;
 var money = 10;
 var materials = 10;
 var spotList = [];
@@ -33,8 +33,19 @@ const materialTime = 1;
 var windowScale = 1;
 var borderX = 0;
 var borderY = 0;
-
+var frame;
+var frameStyle;
+var shop;
 var messageList;
+
+var shopOpen = false;
+var shopOpenTime = 0;
+var shopMoney;
+var shopMaterials;
+var keyDownEvent;
+var keyUpEvent;
+var shopKeyDownEvent;
+var shopKeyUpEvent;
 
 class Spot {
     constructor(X,Y,type) {
@@ -45,6 +56,7 @@ class Spot {
         this.width = playerSize;
         this.height = playerSize;
         this.framesIn = 0; //how many frames has the player been inside
+        this.hoveredLastFrame = false; //if the player was inside last frame
         this.element.style.position = "absolute";
         this.element.style.zIndex = 80;
         this.element.style.left = transX(this.X) + "px";
@@ -63,6 +75,10 @@ class Spot {
     destroy() {
         this.element.remove();
         // this = null;
+    }
+
+    playerOverlapping() {
+        return playerX+playerSize>this.X && playerX<this.X+this.width && playerY+playerSize>this.Y && playerY<this.Y+this.width;
     }
 }
 
@@ -94,6 +110,11 @@ function main() {
     spotList.push(new BuildSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
     spotList.push(new MaterialSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
 
+    frame = document.getElementById("frame");
+    frameStyle = frame.style;
+    shop = document.getElementById("shop");
+    shopMoney = document.getElementById("shopMoney");
+    shopMaterials = document.getElementById("shopMaterials");
     messageList = document.getElementById("messageList");
 
     windowResized();
@@ -111,7 +132,8 @@ function main() {
 function loop() {
     moveSquare();
     checkCollisions();
-    processGame();
+    if (shopOpen) updateShop();
+    else processGame();
     updateUI();
 }
 
@@ -150,7 +172,7 @@ function checkCollisions() {
         var spot = spotList[i];
         switch (spot.type) {
             case "build":
-                if (playerX+playerSize>spot.X && playerX<spot.X+spot.width && playerY+playerSize>spot.Y && playerY<spot.Y+spot.width) {
+                if (spot.playerOverlapping()) {
                     if(materials>=5)spot.framesIn++;
                     if (spot.framesIn >= buildTime) {
                         spotList.splice(i, 1);
@@ -159,11 +181,15 @@ function checkCollisions() {
                         materials -= 5;
                         spotList.push(new BuildSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
                         i--;
+                        if (!building) {
+                            building = true;
+                            buildStartTime = Date.now();
+                        }
                     }
                 }
                 break;
             case "material":
-                if (playerX+playerSize>spot.X && playerX<spot.X+spot.width && playerY+playerSize>spot.Y && playerY<spot.Y+spot.width) {
+                if (spot.playerOverlapping()) {
                     spot.framesIn++
                     if (spot.framesIn >= materialTime) {
                         spotList.splice(i, 1);
@@ -187,15 +213,35 @@ function processGame() {
     if (buildpct >= 100) {
         floors++;
         buildpct = 0;
-        money += 5;
+        money += (building && Date.now()-buildStartTime<10000) ?10:5;
+        displayMessage("+ $"+((building && Date.now()-buildStartTime<10000) ?10:5));
+        building = false;
     }
 
 }
 
 function updateUI() {
 
+    var timer = (building && Date.now()-buildStartTime<10000)?"<br><br>Time Left<br>for bonus:<br>"+((buildStartTime+10000-Date.now())/1000)+" seconds":"";
+
     statusUI.innerHTML = "Build Percent: " + buildpct + "%, Materials: " + materials + "/20, Money: $" + money;
-    tower.innerHTML = "Floors: " + floors;
+    tower.innerHTML = "Floors: " + floors + timer;
+
+}
+
+function toggleShop() {
+    
+    if (shopOpen) {
+        document.addEventListener("keydown", shopKeyDown);
+        document.addEventListener("keyup", shopKeyUp);
+        shop.style.display = "block";
+        shopOpenTime = Date.now();
+    } else {
+        document.removeEventListener("keydown",shopKeyDown);
+        document.removeEventListener("keyup",shopKeyUp);
+        shop.style.display = "none";
+        buildStartTime += Date.now() - shopOpenTime;
+    }
 
 }
 
@@ -207,9 +253,6 @@ function windowResized() {
 }
 
 function resizeWindow(w, h) {
-
-    var frame = document.getElementById("frame");
-    var frameStyle = frame.style;
 
     //cut off subpixels
     w = Math.floor(w);
@@ -224,7 +267,6 @@ function resizeWindow(w, h) {
         
         frameStyle.width = w + "px";
         frameStyle.height = newH + "px";
-        frameStyle.margin = borderY + "px 0";
 
         messageList.style.left = "0";
         messageList.style.top = borderY + "px";
@@ -236,7 +278,6 @@ function resizeWindow(w, h) {
         borderX = (w-newW)/2;
         borderY = 0;
 
-        frameStyle.margin =  "0 " + borderX + "px";
         frameStyle.width = newW + "px";
         frameStyle.height = h + "px";
 
@@ -244,6 +285,9 @@ function resizeWindow(w, h) {
         messageList.style.top = "0";
 
     }
+
+    frameStyle.margin = borderY + "px " + borderX + "px";
+    shop.style.inset = transY(50) + "px " + transX(100) + "px";
 
     playerStyle.width = playerSize * windowScale + "px";
     playerStyle.height =  playerSize * windowScale + "px";
@@ -260,14 +304,6 @@ function resizeWindow(w, h) {
     tower.style.top = transY(175) + "px";
 }
 
-function transX(x) {
-    return x*windowScale+borderX;
-}
-
-function transY(y) {
-    return y*windowScale+borderY;
-}
-
 function displayMessage(msg) {
 
     let message = document.createElement("div");
@@ -282,29 +318,66 @@ function displayMessage(msg) {
 
 }
 
-function displayWarning(warning) { //this is like display message but only 1 warning at a time, has its own box on the screen, use this for tutorial or errors
+function displayWarning(msg) { //this is like display message but only 1 warning at a time, has its own box on the screen, use this for tutorial or errors
 
 }
 
-function toggleShop() {
+function updateShop() {
+    shopMoney.innerHTML = "Money: $" + money;
+    shopMaterials.innerHTML = "Materials: " + materials + "/20";
+}
 
+function transX(x) {
+    return x*windowScale+borderX;
+}
+
+function transY(y) {
+    return y*windowScale+borderY;
 }
 
 // KEYBOARD RELATED FUNCTIONS -------------------------------------------------
 
-document.addEventListener("keydown", (event) => {
+keyDownEvent = document.addEventListener("keydown", (event) => {
     const keyName = event.key.toLowerCase();
-    if (keyList[keyName] != undefined) {
+    if (keyName == 'b') {
+        shopOpen = !shopOpen;
+        toggleShop();
+    } else if (keyList[keyName] != undefined) {
         keyList[keyName] = true;
     }
 });
 
-document.addEventListener("keyup", (event) => {
+keyUpEvent = document.addEventListener("keyup", (event) => {
     const keyName = event.key.toLowerCase();
     if (keyList[keyName] != undefined) {
         keyList[keyName] = false;
     }
 });
+
+function shopKeyDown(event) {
+    switch (event.key.toLowerCase()) {
+        case '1':
+            if (money >= 10 && materials<=10) {
+                materials += 10;
+                money -= 10;
+                displayMessage("Bought 10 materials");
+                displayMessage("+ 10 materials");
+                displayMessage("- $10");
+            } else if (materials > 10) {
+                displayMessage("You have too many resources!")
+            } else {
+                displayMessage("You don't have enough money!");
+            }
+            break;
+    }
+}
+
+function shopKeyUp(event) {
+    switch (event.key.toLowerCase()) {
+        case '1':
+            break;
+    }
+}
 
 // MISC FUNCTIONS -------------------------------------------------------------
 

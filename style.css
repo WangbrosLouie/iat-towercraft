@@ -57,3 +57,25 @@ body { display: block;
 	font-size: 1em;
 	border-bottom: 1px solid black;
 }
+
+/* shop stuff */
+
+#shop { display: none;
+	position: absolute;
+	background: white;
+	border: 5px solid black;
+	overflow-y: scroll;
+	z-index: 100;
+}
+
+.shopheader { color: black;
+	text-shadow: 0;
+	text-align: center;
+}
+
+.shopbutton { color: white;
+	text-shadow: 0;
+	text-align: center;
+}
+
+.shopbutton:hover { color: grey;}

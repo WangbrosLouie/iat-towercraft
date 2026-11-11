@@ -20,20 +20,22 @@
         maybe add collision detection for the tower, if wanted<br>
 
 
-        <button onClick="materials+=999">cheat button (mats)</button>
-        <button onClick="buildPct=100">cheat button (b%)</button>
-        <button onClick="money+=999">cheat button ($$$)</button>
     -->
 
     <template id="spot"><img></template>
 
     <div id="frame">
-        <div style="width:100%;text-align:center;">
-            <br><br><br><br><br>
-            wasd to move, b to open shop<br>
-            go over hammers for 1 sec to build tower, go over wood to get resources<br>
-            you need 5 resources to build once<br>
+        <div style="width:100%;text-align:center;"><!--this is temporary-->
+            <br><br><br><br>
+            <color style="color:white;">don't hold down the b key if you have epilepsy</color><br>
+            controls: wasd to move, b to open shop<br>
+            go over hammers for 1 sec to build tower, go over wood to get materials<br>
+            you need 5 materials to build once, each build increases build percentage by 25%<br>
+            every floor built gives $5, if completed under 10 seconds gives extra $5<br>
         </div>
+        <button onClick="materials+=999">cheat button (mats)</button>
+        <button onClick="buildPct=100">cheat button (b%)</button>
+        <button onClick="money+=999">cheat button ($$$)</button>
 
         <div style="width:100%;text-align:center;" id="status"></div>
 
@@ -68,6 +70,16 @@ A">
         </div>
 
         <div id="messageList"></div>
+        <div id="shop">
+            <h1 class="shopheader">Shop</h1>
+            <h1 class="shopbutton" onclick="shopOpen=false;toggleShop();">press 'b' or click me to close shop</h1>
+            <h1 class="shopheader" id="shopMoney">Money: $???</h1>
+            <h1 class="shopheader" id="shopMaterials">Materials: ???</h1>
+            <h1 class="shopheader">10 resources for $10</h1>
+            <h1 class="shopheader">Press '1' to buy resources</h1>
+            <h1 class="shopheader">You can only buy if you have money and space</h1>
+            <h1 class="shopheader">don't worry, the game is paused while in the shop</h1>
+        </div>
     </div>
 
 </body>
