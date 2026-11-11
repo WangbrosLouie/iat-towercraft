@@ -1,4 +1,4 @@
-const version = "0.4.0";
+const version = "0.5.0";
 
 const windowX = 800;
 const windowY = 450;
@@ -26,6 +26,7 @@ var buildStartTime = 0;
 var building = false;
 var money = 10;
 var materials = 10;
+var maxMaterials = 20;
 var spotList = [];
 const buildTime = frameRate;
 const materialTime = 1;
@@ -33,19 +34,28 @@ const materialTime = 1;
 var windowScale = 1;
 var borderX = 0;
 var borderY = 0;
+var highContrast = false;
 var frame;
 var frameStyle;
 var shop;
+var options;
 var messageList;
+var mobileControls;
+var mobileControlsUp;
+var mobileControlsLeft;
+var mobileControlsRight;
+var mobileControlsDown;
 
+var menuOpenTime = 0;
 var shopOpen = false;
-var shopOpenTime = 0;
 var shopMoney;
 var shopMaterials;
-var keyDownEvent;
-var keyUpEvent;
-var shopKeyDownEvent;
-var shopKeyUpEvent;
+var optionsOpen = false;
+
+var mobileUp = false;
+var mobileLeft = false;
+var mobileRight = false;
+var mobileDown = false;
 
 class Spot {
     constructor(X,Y,type) {
@@ -58,11 +68,12 @@ class Spot {
         this.framesIn = 0; //how many frames has the player been inside
         this.hoveredLastFrame = false; //if the player was inside last frame
         this.element.style.position = "absolute";
-        this.element.style.zIndex = 80;
+        // this.element.style.zIndex = 30;
         this.element.style.left = transX(this.X) + "px";
         this.element.style.top = transY(this.Y) + "px";
         this.element.style.width = playerSize * windowScale + "px";
         this.element.style.height =  playerSize * windowScale + "px";
+        this.element.classList.add = "spot";
     }
 
     updateView() {
@@ -116,16 +127,21 @@ function main() {
     shopMoney = document.getElementById("shopMoney");
     shopMaterials = document.getElementById("shopMaterials");
     messageList = document.getElementById("messageList");
+    options = document.getElementById("options");
 
     windowResized();
     setInterval(loop, 1000/frameRate);
 
     document.getElementById("warning").remove(); // if all goes well, remove the error warning
 
+    document.addEventListener("keydown", keyDown);
+    document.addEventListener("keyup", keyUp);
+
     displayMessage("Towercraft v" + version);
     document.title = "Towercraft v" + version;
 
-    displayMessage("this is a message. it will fade away after 5 seconds, so be sure to read them quickly!")
+    displayMessage("this is a message. it will fade away after 10 seconds, so be sure to read them quickly!")
+    displayMessage("High Contrast Mode in Options (press O)").firstElementChild.classList.add("hcmessage");
 
 }
 
@@ -133,14 +149,15 @@ function loop() {
     moveSquare();
     checkCollisions();
     if (shopOpen) updateShop();
+    else if (optionsOpen) updateOptions();
     else processGame();
     updateUI();
 }
 
 function moveSquare() {
 
-    var horiMove = keyList['a'] ^ keyList['d'];
-    var vertMove = keyList['w'] ^ keyList['s'];
+    var horiMove = (keyList['a']|mobileLeft) ^ (keyList['d']|mobileRight);
+    var vertMove = (keyList['w']|mobileUp) ^ (keyList['s']|mobileDown);
 
     const oldX = playerX;
     const oldY = playerY;
@@ -224,7 +241,7 @@ function updateUI() {
 
     var timer = (building && Date.now()-buildStartTime<10000)?"<br><br>Time Left<br>for bonus:<br>"+((buildStartTime+10000-Date.now())/1000)+" seconds":"";
 
-    statusUI.innerHTML = "Build Percent: " + buildpct + "%, Materials: " + materials + "/20, Money: $" + money;
+    statusUI.innerHTML = "Build Percent: " + buildpct + "%, Materials: " + materials + "/" + maxMaterials + ", Money: $" + money;
     tower.innerHTML = "Floors: " + floors + timer;
 
 }
@@ -234,15 +251,53 @@ function toggleShop() {
     if (shopOpen) {
         document.addEventListener("keydown", shopKeyDown);
         document.addEventListener("keyup", shopKeyUp);
+        document.removeEventListener("keydown",keyDown);
+        document.removeEventListener("keyup",keyUp);
         shop.style.display = "block";
-        shopOpenTime = Date.now();
+        menuOpenTime = Date.now();
     } else {
         document.removeEventListener("keydown",shopKeyDown);
         document.removeEventListener("keyup",shopKeyUp);
+        document.addEventListener("keydown", keyDown);
+        document.addEventListener("keyup", keyUp);
         shop.style.display = "none";
-        buildStartTime += Date.now() - shopOpenTime;
+        buildStartTime += Date.now() - menuOpenTime;
     }
 
+}
+
+function toggleOptions() {
+    
+    if (optionsOpen) {
+        document.addEventListener("keydown", optionsKeyDown);
+        // document.addEventListener("keyup", optionsKeyUp);
+        document.removeEventListener("keydown",keyDown);
+        document.removeEventListener("keyup",keyUp);
+        options.style.display = "block";
+        menuOpenTime = Date.now();
+    } else {
+        document.removeEventListener("keydown",optionsKeyDown);
+        // document.removeEventListener("keyup",optionsKeyUp);
+        document.addEventListener("keydown", keyDown);
+        document.addEventListener("keyup", keyUp);
+        options.style.display = "none";
+        buildStartTime += Date.now() - menuOpenTime;
+    }
+
+}
+
+function buyMaterials() {
+    if (money >= 10 && materials<=10) {
+        materials += 10;
+        money -= 10;
+        displayMessage("Bought 10 materials");
+        displayMessage("+ 10 materials");
+        displayMessage("- $10");
+    } else if (materials > 10) {
+        displayMessage("You have too many resources!")
+    } else {
+        displayMessage("You don't have enough money!");
+    }
 }
 
 // WINDOW RELATED FUNCTIONS ---------------------------------------------------
@@ -288,6 +343,7 @@ function resizeWindow(w, h) {
 
     frameStyle.margin = borderY + "px " + borderX + "px";
     shop.style.inset = transY(50) + "px " + transX(100) + "px";
+    options.style.inset = transY(50) + "px " + transX(100) + "px";
 
     playerStyle.width = playerSize * windowScale + "px";
     playerStyle.height =  playerSize * windowScale + "px";
@@ -306,15 +362,18 @@ function resizeWindow(w, h) {
 
 function displayMessage(msg) {
 
-    let message = document.createElement("div");
+    let messageWrapper = document.createElement("div");
+    let message = document.createElement("span");
     message.innerHTML = msg;
     message.className = "gameMessage";
-    messageList.appendChild(message);
+    messageWrapper.appendChild(message);
+    messageList.appendChild(messageWrapper);
     let animFrame = 0;
     setTimeout((event) => {
         let interval = setInterval((event) => {message.style.opacity = 1-(animFrame/frameRate);animFrame++}, 1000/frameRate);
         setTimeout((event)=>{clearInterval(interval);message.remove();}, 1000)
-    }, 4000);
+    }, 9000);
+    return messageWrapper;
 
 }
 
@@ -324,7 +383,24 @@ function displayWarning(msg) { //this is like display message but only 1 warning
 
 function updateShop() {
     shopMoney.innerHTML = "Money: $" + money;
-    shopMaterials.innerHTML = "Materials: " + materials + "/20";
+    shopMaterials.innerHTML = "Materials: " + materials + "/" + maxMaterials;
+}
+
+function updateOptions() {
+    options.innerHTML = "Press the key in (brackets) to toggle options<br>[" + (highContrast?"X":"_") + "] (H)igh Contrast";
+}
+
+function contrast(high) {
+    var elements = document.getElementsByTagName("*");
+    if (high) {
+        for (var element of elements) {
+            element.classList.add("hc");
+        }
+    } else {
+        for (var element of elements) {
+            element.classList.remove("hc");
+        }
+    }
 }
 
 function transX(x) {
@@ -337,37 +413,34 @@ function transY(y) {
 
 // KEYBOARD RELATED FUNCTIONS -------------------------------------------------
 
-keyDownEvent = document.addEventListener("keydown", (event) => {
+function keyDown(event) {
     const keyName = event.key.toLowerCase();
     if (keyName == 'b') {
-        shopOpen = !shopOpen;
+        shopOpen = true;
         toggleShop();
+    } else if (keyName == 'o') {
+        optionsOpen = true;
+        toggleOptions();
     } else if (keyList[keyName] != undefined) {
         keyList[keyName] = true;
     }
-});
+}
 
-keyUpEvent = document.addEventListener("keyup", (event) => {
+function keyUp(event) {
     const keyName = event.key.toLowerCase();
     if (keyList[keyName] != undefined) {
         keyList[keyName] = false;
     }
-});
+}
 
 function shopKeyDown(event) {
     switch (event.key.toLowerCase()) {
+        case 'b':
+            shopOpen = false;
+            toggleShop();
+            break;
         case '1':
-            if (money >= 10 && materials<=10) {
-                materials += 10;
-                money -= 10;
-                displayMessage("Bought 10 materials");
-                displayMessage("+ 10 materials");
-                displayMessage("- $10");
-            } else if (materials > 10) {
-                displayMessage("You have too many resources!")
-            } else {
-                displayMessage("You don't have enough money!");
-            }
+            buyMaterials();
             break;
     }
 }
@@ -376,6 +449,18 @@ function shopKeyUp(event) {
     switch (event.key.toLowerCase()) {
         case '1':
             break;
+    }
+}
+
+function optionsKeyDown(event) {
+    switch (event.key.toLowerCase()) {
+        case 'o':
+            optionsOpen = false;
+            toggleOptions();
+            break;
+        case 'h':
+            highContrast = !highContrast;
+            contrast(highContrast);
     }
 }
 

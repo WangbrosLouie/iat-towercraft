@@ -20,6 +20,9 @@
         maybe add collision detection for the tower, if wanted<br>
 
 
+        <button onClick="materials+=999">cheat button (mats)</button>
+        <button onClick="buildPct=100">cheat button (b%)</button>
+        <button onClick="money+=999">cheat button ($$$)</button>
     -->
 
     <template id="spot"><img></template>
@@ -33,9 +36,6 @@
             you need 5 materials to build once, each build increases build percentage by 25%<br>
             every floor built gives $5, if completed under 10 seconds gives extra $5<br>
         </div>
-        <button onClick="materials+=999">cheat button (mats)</button>
-        <button onClick="buildPct=100">cheat button (b%)</button>
-        <button onClick="money+=999">cheat button ($$$)</button>
 
         <div style="width:100%;text-align:center;" id="status"></div>
 
@@ -71,15 +71,26 @@ A">
 
         <div id="messageList"></div>
         <div id="shop">
-            <h1 class="shopheader">Shop</h1>
-            <h1 class="shopbutton" onclick="shopOpen=false;toggleShop();">press 'b' or click me to close shop</h1>
+            <h1 class="shoptitle" onclick="shopOpen=false;toggleShop();">Shop - click me or press 'B' to close</h1>
             <h1 class="shopheader" id="shopMoney">Money: $???</h1>
             <h1 class="shopheader" id="shopMaterials">Materials: ???</h1>
-            <h1 class="shopheader">10 resources for $10</h1>
-            <h1 class="shopheader">Press '1' to buy resources</h1>
+            <span class="shopbutton" onclick="buyMaterials();">Buy 10 materials for $10</span>
+            <h1 class="shopheader">Click the button or press '1' to buy materials</h1>
             <h1 class="shopheader">You can only buy if you have money and space</h1>
             <h1 class="shopheader">don't worry, the game is paused while in the shop</h1>
         </div>
+        <div id="options">
+            <h1 class="optionstitle" onclick="optionsOpen=false;toggleOptions();">Options - click me or press 'O' to close</h1>
+            <h1 class="options"
+        </div>
+
+        <div id="mobilecontrols">
+            <div id="mobileup">↑</div>
+            <div id="mobileleft">←</div>
+            <div id="mobileright">→</div>
+            <div id="mobiledown">↓</div>
+        </div>
+
     </div>
 
 </body>

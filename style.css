@@ -28,7 +28,7 @@ body { display: block;
 	text-align: center;
 	line-height: 50%;
 	background: white;
-	z-index: 90;
+	z-index: 50;
 	white-space: pre-wrap;
 }
 
@@ -42,7 +42,11 @@ body { display: block;
 	line-height: 100%;
 	color: white;
 	background: grey;
-	z-index: 70;
+	z-index: 20;
+}
+
+.spot { z-index: 30;
+
 }
 
 /* game message stuff */
@@ -50,6 +54,7 @@ body { display: block;
 #messageList { display: inline;
 	position: absolute;
 	top: 0;
+	z-index: 60;
 }
 
 .gameMessage { color: gold;
@@ -58,24 +63,75 @@ body { display: block;
 	border-bottom: 1px solid black;
 }
 
+.gameMessage.hcmessage { color: white;
+	font-weight: bold;
+	background: black;
+}
+
 /* shop stuff */
 
 #shop { display: none;
 	position: absolute;
 	background: white;
 	border: 5px solid black;
+	padding: 0.5em;
 	overflow-y: scroll;
 	z-index: 100;
+	text-shadow: none;
 }
+
+.shoptitle { background: lime;
+	color: black;
+	margin: 0;
+	padding: 0.5em;
+}
+.shoptitle:hover { color: red;}
 
 .shopheader { color: black;
-	text-shadow: 0;
-	text-align: center;
 }
 
-.shopbutton { color: white;
-	text-shadow: 0;
-	text-align: center;
+.shopbutton { background: lime;
+	color: black;
+	font-size: 2em;
+	padding: 0.5em;
 }
-
 .shopbutton:hover { color: grey;}
+
+/* options menu stuff */
+
+#options { display: none;
+	position: absolute;
+	background: white;
+	border: 5px solid black;
+	overflow-y: scroll;
+	z-index: 100;
+	color: black;
+	text-shadow: 0;
+	font-size: 2em;
+}
+
+/* high contrast styles */
+.hc { font-weight: bold;
+	color: white;
+	text-shadow: none;
+}
+
+html.hc { background: white;}
+
+#frame.hc { background: black;}
+
+#tower.hc { background: cyan;
+	color: red;
+}
+
+.gameMessage.hc { color: yellow;}
+
+/* Layering (top to bottom)
+100 Popup windows
+ 90 Warning window
+ 80 touch controls
+ 60 messages
+ 50 player
+ 30 spots
+ 20 tower
+*/
