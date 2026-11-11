@@ -1,4 +1,4 @@
-const version = "0.7.0";
+const version = "1.0.0";
 
 const windowX = 800;
 const windowY = 450;
@@ -26,10 +26,11 @@ var buildStartTime = 0;
 var building = false;
 var money = 10;
 var materials = 10;
+var buildEffectiveness = 20;
 var maxMaterials = 20;
 var spotList = [];
-const buildTime = frameRate;
-const materialTime = frameRate/2;
+var buildTime = frameRate;
+var materialTime = frameRate/2;
 
 var windowScale = 1;
 var borderX = 0;
@@ -164,13 +165,30 @@ function main() {
 
     displayMessage("this is a message. it will fade away after 10 seconds, so be sure to read them quickly!")
     displayMessage("High Contrast Mode in Options (press O)").firstElementChild.classList.add("hcmessage");
+    displayMessage("Don't hold down the B or O keys if you have epilepsy!!!").firstElementChild.classList.add("hcmessage");
     displayMessage("Enable mobile controls by tapping the screen")
+
+    setTimeout((event) => {displayMessage("controls: wasd to move, b to open shop, o to open options");},1000);
+    setTimeout((event) => {displayMessage("go over hammers for 1 sec to build tower, go over wood to get materials");},4000);
+    setTimeout((event) => {displayMessage("you need 5 materials to build once, each build increases build percentage by 25%");},8000);
+    setTimeout((event) => {displayMessage("every floor built gives $5, if completed under 10 seconds gives extra $5");},12000);
+    setTimeout((event) => {displayMessage("there might be a surprise for you if you finish 3 floors :)");},16000);
+
+    let threecheck;
+    threecheck = setInterval((event) => {
+        if (floors>=3) {
+            clearInterval(threecheck);
+            showPopup();
+        }
+    },1000);
 
 }
 
 function loop() {
-    moveSquare();
-    checkCollisions();
+    if(!menuOpen) {
+        moveSquare();
+        checkCollisions();
+    }
     if (shopOpen) updateShop();
     else if (optionsOpen) updateOptions();
     else processGame();
@@ -223,7 +241,7 @@ function checkCollisions() {
                     if (spot.framesIn >= buildTime) {
                         spotList.splice(i, 1);
                         spot.destroy();
-                        buildpct += 25;
+                        buildpct += buildEffectiveness;
                         materials -= 5;
                         spotList.push(new BuildSpot(Math.floor(Math.random()*(windowX-playerSize)),Math.floor(Math.random()*(windowY-playerSize))));
                         i--;
@@ -236,7 +254,7 @@ function checkCollisions() {
                 break;
             case "material":
                 if (spot.playerOverlapping()) {
-                    spot.framesIn++
+                    if(materials<maxMaterials)spot.framesIn++
                     if (spot.framesIn >= materialTime) {
                         materials++;
                         spot.remaining--;
@@ -295,6 +313,9 @@ function toggleMenu(open) {
         document.addEventListener("keyup", keyUp);
         buildStartTime += Date.now() - menuOpenTime;
         if(mobileControlsEnabled)mobileControls.style.display = "block";else mobileControlsEnabler.style.display = "block";
+        for (key in keyList) {
+            keyList[key] = false;
+        }
     }
 }
 
@@ -542,4 +563,15 @@ function clamp(value, min, max) {
     value = Math.max(value, min);
     value = Math.min(value, max);
     return value;
+}
+
+function showPopup() {
+    document.getElementById("popup").style.display = "block";
+    toggleMenu(true);
+}
+
+function hidePopup() {
+    document.getElementById("popup").remove();
+    toggleMenu(false);
+    displayMessage("\"Thanks for letting me practice! Enjoy your upgrades!\"")
 }

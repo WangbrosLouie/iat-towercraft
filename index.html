@@ -19,23 +19,15 @@
         touch controls<br>
         maybe add collision detection for the tower, if wanted<br>
 
-
         <button onClick="materials+=999">cheat button (mats)</button>
         <button onClick="buildPct=100">cheat button (b%)</button>
         <button onClick="money+=999">cheat button ($$$)</button>
+
     -->
 
     <template id="spot"><img></template>
 
     <div id="frame">
-        <div style="width:100%;text-align:center;"><!--this is temporary-->
-            <br><br><br><br>
-            <color style="color:white;">don't hold down the b or o keys if you have epilepsy</color><br>
-            controls: wasd to move, b to open shop, o to open options<br>
-            go over hammers for 1 sec to build tower, go over wood to get materials<br>
-            you need 5 materials to build once, each build increases build percentage by 25%<br>
-            every floor built gives $5, if completed under 10 seconds gives extra $5<br>
-        </div>
 
         <div style="width:100%;text-align:center;" id="status"></div>
 
@@ -84,6 +76,13 @@ A">
             <h1 class="shopheader">Press the key in (brackets) or the option to toggle options</h1>
             <h1 class="shopheader" id="optionsContrast" onclick="highContrast=!highContrast;toggleContrast(highContrast);"></h1>
             <h1 class="shopheader" id="optionsMobile" onclick="mobileControlsEnabled=!mobileControlsEnabled;toggleMobile(mobileControlsEnabled);"></h1>
+        </div>
+        <div id="popup">
+            <h1 class="shopheader">A random encounter</h1>
+            <p>You turn around and see a random person who has seemingly appeared out of nowhere. They say to you:</p>
+            <p>"I want to exercise my ability to upgrade things on your things. I see that you have tools and a backpack. I only have time to upgrade one, which one would you like me to upgrade? And I'm not taking a no for an answer.</p><br>
+            <p><span class="shopbutton" onclick="maxMaterials+=5;hidePopup();">Backpack (gain 5 more space for materials)</span></p><br>
+            <p><span class="shopbutton" onclick="buildTime=Math.round(buildTime/2);materialTime=Math.round(materialTime/2);hidePopup();">Tools (time spent in action spots reduced by half)</span></p>
         </div>
 
         <div id="mobileControls">
