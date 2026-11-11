@@ -71,7 +71,7 @@ A">
 
         <div id="messageList"></div>
         <div id="shop">
-            <h1 class="shoptitle" onclick="shopOpen=false;toggleShop();">Shop - click me or press 'B' to close</h1>
+            <h1 class="shoptitle" onclick="toggleShop();">Shop - click me or press 'B' to close</h1>
             <h1 class="shopheader" id="shopMoney">Money: $???</h1>
             <h1 class="shopheader" id="shopMaterials">Materials: ???</h1>
             <span class="shopbutton" onclick="buyMaterials();">Buy 10 materials for $10</span>
@@ -80,16 +80,21 @@ A">
             <h1 class="shopheader">don't worry, the game is paused while in the shop</h1>
         </div>
         <div id="options">
-            <h1 class="optionstitle" onclick="optionsOpen=false;toggleOptions();">Options - click me or press 'O' to close</h1>
-            <h1 class="options"
+            <h1 class="optionstitle" onclick="toggleOptions();">Options - click me or press 'O' to close</h1>
+            <h1 class="shopheader">Press the key in (brackets) or the option to toggle options</h1>
+            <h1 class="shopheader" id="optionsContrast" onclick="highContrast=!highContrast;toggleContrast(highContrast);"></h1>
+            <h1 class="shopheader" id="optionsMobile" onclick="mobileControlsEnabled=!mobileControlsEnabled;toggleMobile(mobileControlsEnabled);"></h1>
         </div>
 
-        <div id="mobilecontrols">
-            <div id="mobileup">↑</div>
-            <div id="mobileleft">←</div>
-            <div id="mobileright">→</div>
-            <div id="mobiledown">↓</div>
+        <div id="mobileControls">
+            <div class="mobilecontrol" id="mobileUp" onmouseover="mobileUp=true;" onmouseout="mobileUp=false;">↑</div>
+            <div class="mobilecontrol" id="mobileLeft" onmouseover="mobileLeft=true;" onmouseout="mobileLeft=false;">←</div>
+            <div class="mobilecontrol" id="mobileRight" onmouseover="mobileRight=true;" onmouseout="mobileRight=false;">→</div>
+            <div class="mobilecontrol" id="mobileDown" onmouseover="mobileDown=true;" onmouseout="mobileDown=false;">↓</div>
+            <div id="mobileShop"></div>
+            <div id="mobileOptions"></div>
         </div>
+        <div id="mobileControlsEnabler" onclick="mobileControlsEnabled=true;toggleMobile(mobileControlsEnabled);"></div>
 
     </div>
 

@@ -1,4 +1,4 @@
-const version = "0.5.0";
+const version = "0.6.0";
 
 const windowX = 800;
 const windowY = 450;
@@ -45,17 +45,24 @@ var mobileControlsUp;
 var mobileControlsLeft;
 var mobileControlsRight;
 var mobileControlsDown;
+var mobileShop;
+var mobileOptions;
 
 var menuOpenTime = 0;
+var menuOpen = false;
 var shopOpen = false;
 var shopMoney;
 var shopMaterials;
 var optionsOpen = false;
+var optionsContrast;
+var optionsMobile;
 
+var mobileControlsEnabled = false;
 var mobileUp = false;
 var mobileLeft = false;
 var mobileRight = false;
 var mobileDown = false;
+var mobileControlsEnabler;
 
 class Spot {
     constructor(X,Y,type) {
@@ -67,13 +74,13 @@ class Spot {
         this.height = playerSize;
         this.framesIn = 0; //how many frames has the player been inside
         this.hoveredLastFrame = false; //if the player was inside last frame
-        this.element.style.position = "absolute";
+        // this.element.style.position = "absolute";
         // this.element.style.zIndex = 30;
         this.element.style.left = transX(this.X) + "px";
         this.element.style.top = transY(this.Y) + "px";
         this.element.style.width = playerSize * windowScale + "px";
         this.element.style.height =  playerSize * windowScale + "px";
-        this.element.classList.add = "spot";
+        this.element.classList.add("spot");
     }
 
     updateView() {
@@ -128,6 +135,17 @@ function main() {
     shopMaterials = document.getElementById("shopMaterials");
     messageList = document.getElementById("messageList");
     options = document.getElementById("options");
+    optionsContrast = document.getElementById("optionsContrast");
+    optionsMobile = document.getElementById("optionsMobile");
+
+    mobileControls = document.getElementById("mobileControls");
+    mobileControlsUp = document.getElementById("mobileUp");
+    mobileControlsLeft = document.getElementById("mobileLeft");
+    mobileControlsRight = document.getElementById("mobileRight");
+    mobileControlsDown = document.getElementById("mobileDown");
+    mobileShop = document.getElementById("mobileShop");
+    mobileOptions = document.getElementById("mobileOptions");
+    mobileControlsEnabler = document.getElementById("mobileControlsEnabler");
 
     windowResized();
     setInterval(loop, 1000/frameRate);
@@ -137,11 +155,15 @@ function main() {
     document.addEventListener("keydown", keyDown);
     document.addEventListener("keyup", keyUp);
 
+    mobileShop.addEventListener("click", toggleShop);
+    mobileOptions.addEventListener("click", toggleOptions);
+
     displayMessage("Towercraft v" + version);
     document.title = "Towercraft v" + version;
 
     displayMessage("this is a message. it will fade away after 10 seconds, so be sure to read them quickly!")
     displayMessage("High Contrast Mode in Options (press O)").firstElementChild.classList.add("hcmessage");
+    displayMessage("Enable mobile controls by tapping the screen")
 
 }
 
@@ -155,24 +177,30 @@ function loop() {
 }
 
 function moveSquare() {
-
-    var horiMove = (keyList['a']|mobileLeft) ^ (keyList['d']|mobileRight);
-    var vertMove = (keyList['w']|mobileUp) ^ (keyList['s']|mobileDown);
+    /*var horiMove = (keyList['a']||mobileLeft) ^ (keyList['d']||mobileRight);
+    var vertMove = (keyList['w']||mobileUp) ^ (keyList['s']||mobileDown);
 
     const oldX = playerX;
     const oldY = playerY;
 
-	if (keyList['a'] && !keyList['d']) {
+	if ((keyList['a']||mobileLeft) && !(keyList['d']||mobileRight)) {
         playerX -= (2-vertMove)*moveSpeed/frameRate;
-    } else if (!keyList['a'] && keyList['d']) {
+    } else if (!(keyList['a']||mobileLeft) && (keyList['d']||mobileRight)) {
         playerX += (2-vertMove)*moveSpeed/frameRate;
     }
 
-	if (keyList['w'] && !keyList['s']) {
+	if ((keyList['w']||mobileUp) && !(keyList['s']||mobileDown)) {
         playerY -= (2-horiMove)*moveSpeed/frameRate;
-    } else if (!keyList['w'] && keyList['s']) {
+    } else if (!(keyList['w']||mobileUp) && (keyList['s']||mobileDown)) {
         playerY += (2-horiMove)*moveSpeed/frameRate;
-    }
+    }*/
+
+    var horiMove = (keyList['d']||mobileRight) - (keyList['a']||mobileLeft);
+    var vertMove = (keyList['s']||mobileDown) - (keyList['w']||mobileUp);
+    const oldX = playerX;
+    const oldY = playerY;
+    playerX += (2-Math.abs(vertMove))*moveSpeed*horiMove/frameRate;
+    playerY += (2-Math.abs(horiMove))*moveSpeed*vertMove/frameRate;
 
     playerX = clamp(playerX, 0, windowX-playerSize); //window x is 0 to 800
     playerY = clamp(playerY, 0, windowY-playerSize); //window y is 0 to 450
@@ -246,43 +274,52 @@ function updateUI() {
 
 }
 
+function toggleMenu(open) {
+
+    menuOpen = open;
+    if (menuOpen) {
+        document.removeEventListener("keydown",keyDown);
+        document.removeEventListener("keyup",keyUp);
+        menuOpenTime = Date.now();
+        mobileControls.style.display = "none";
+        mobileControlsEnabler.style.display = "none";
+    } else {
+        document.addEventListener("keydown", keyDown);
+        document.addEventListener("keyup", keyUp);
+        buildStartTime += Date.now() - menuOpenTime;
+        if(mobileControlsEnabled)mobileControls.style.display = "block";else mobileControlsEnabler.style.display = "block";
+    }
+}
+
 function toggleShop() {
     
+    shopOpen = !shopOpen;
     if (shopOpen) {
         document.addEventListener("keydown", shopKeyDown);
         document.addEventListener("keyup", shopKeyUp);
-        document.removeEventListener("keydown",keyDown);
-        document.removeEventListener("keyup",keyUp);
         shop.style.display = "block";
-        menuOpenTime = Date.now();
     } else {
         document.removeEventListener("keydown",shopKeyDown);
         document.removeEventListener("keyup",shopKeyUp);
-        document.addEventListener("keydown", keyDown);
-        document.addEventListener("keyup", keyUp);
         shop.style.display = "none";
-        buildStartTime += Date.now() - menuOpenTime;
     }
+    toggleMenu(shopOpen);
 
 }
 
 function toggleOptions() {
     
+    optionsOpen = !optionsOpen;
     if (optionsOpen) {
         document.addEventListener("keydown", optionsKeyDown);
         // document.addEventListener("keyup", optionsKeyUp);
-        document.removeEventListener("keydown",keyDown);
-        document.removeEventListener("keyup",keyUp);
         options.style.display = "block";
-        menuOpenTime = Date.now();
     } else {
         document.removeEventListener("keydown",optionsKeyDown);
         // document.removeEventListener("keyup",optionsKeyUp);
-        document.addEventListener("keydown", keyDown);
-        document.addEventListener("keyup", keyUp);
         options.style.display = "none";
-        buildStartTime += Date.now() - menuOpenTime;
     }
+    toggleMenu(optionsOpen);
 
 }
 
@@ -358,6 +395,15 @@ function resizeWindow(w, h) {
     tower.style.height = 100 * windowScale + "px";
     tower.style.left = transX(350) + "px";
     tower.style.top = transY(175) + "px";
+
+    mobileControlsUp.style.inset = transY(250) + "px " + transX(650) + "px " + transY(150) + "px " + transX(100) + "px";
+    mobileControlsLeft.style.inset = transY(300) + "px " + transX(700) + "px " + transY(100) + "px " + transX(50) + "px";
+    mobileControlsRight.style.inset = transY(300) + "px " + transX(600) + "px " + transY(100) + "px " + transX(150) + "px";
+    mobileControlsDown.style.inset = transY(350) + "px " + transX(650) + "px " + transY(50) + "px " + transX(100) + "px";
+    mobileControlsUp.style.lineHeight = 50 * windowScale + "px";
+    mobileControlsLeft.style.lineHeight = 50 * windowScale + "px";
+    mobileControlsRight.style.lineHeight = 50 * windowScale + "px";
+    mobileControlsDown.style.lineHeight = 50 * windowScale + "px";
 }
 
 function displayMessage(msg) {
@@ -387,10 +433,11 @@ function updateShop() {
 }
 
 function updateOptions() {
-    options.innerHTML = "Press the key in (brackets) to toggle options<br>[" + (highContrast?"X":"_") + "] (H)igh Contrast";
+    optionsContrast.innerHTML = "[" + (highContrast?"X":"_") + "] (H)igh Contrast";
+    optionsMobile.innerHTML = "[" + (mobileControlsEnabled?"X":"_") + "] (M)obile Controls"
 }
 
-function contrast(high) {
+function toggleContrast(high) {
     var elements = document.getElementsByTagName("*");
     if (high) {
         for (var element of elements) {
@@ -400,6 +447,19 @@ function contrast(high) {
         for (var element of elements) {
             element.classList.remove("hc");
         }
+    }
+}
+
+function toggleMobile(enabled) {
+    if (enabled) {
+        mobileControlsEnabler.style.display = "none";
+        if(!optionsOpen)mobileControls.style.display = "block"
+        displayMessage("Mobile controls enabled.")
+        displayMessage("Press on left side of screen for shop,")
+        displayMessage("right side for options.");
+    } else {
+        if(!optionsOpen)mobileControlsEnabler.style.display = "block";
+        mobileControls.style.display = "none"
     }
 }
 
@@ -416,10 +476,8 @@ function transY(y) {
 function keyDown(event) {
     const keyName = event.key.toLowerCase();
     if (keyName == 'b') {
-        shopOpen = true;
         toggleShop();
     } else if (keyName == 'o') {
-        optionsOpen = true;
         toggleOptions();
     } else if (keyList[keyName] != undefined) {
         keyList[keyName] = true;
@@ -436,7 +494,6 @@ function keyUp(event) {
 function shopKeyDown(event) {
     switch (event.key.toLowerCase()) {
         case 'b':
-            shopOpen = false;
             toggleShop();
             break;
         case '1':
@@ -455,12 +512,16 @@ function shopKeyUp(event) {
 function optionsKeyDown(event) {
     switch (event.key.toLowerCase()) {
         case 'o':
-            optionsOpen = false;
             toggleOptions();
             break;
         case 'h':
             highContrast = !highContrast;
-            contrast(highContrast);
+            toggleContrast(highContrast);
+            break;
+        case 'm':
+            mobileControlsEnabled = !mobileControlsEnabled;
+            toggleMobile(mobileControlsEnabled);
+            break;
     }
 }
 
